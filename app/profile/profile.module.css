@@ -1,0 +1,113 @@
+.container {
+  max-width: 780px;
+  margin: 24px auto;
+  padding: 16px;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.profileBox {
+  background: #f7f7f8;
+  padding: 12px;
+  border-radius: 8px;
+  flex: 1;
+}
+
+.logoutButton {
+  margin-left: 16px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background: #dc2626;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.logoutButton:hover {
+  background: #b91c1c;
+}
+
+.email {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form input,
+.form textarea {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+}
+
+.formRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.form button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.note {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  background: white;
+}
+
+.noteHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.noteActions button {
+  margin-left: 8px;
+  background: transparent;
+  border: 1px solid #ddd;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.noteBody {
+  margin: 8px 0;
+}
+
+.meta {
+  font-size: 0.8rem;
+  color: #666;
+}
