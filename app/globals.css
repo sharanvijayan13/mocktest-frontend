@@ -137,3 +137,43 @@
 .divider span {
   padding: 0 0.5rem;
 }
+
+/* Home.module.css or global.css */
+.main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fdfbfb, #ebedee);
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+  padding: 2rem;
+}
+
+.heading {
+  font-size: 2rem;
+  color: #222;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.5px;
+}
+
+.nav {
+  display: flex;
+  gap: 1.2rem;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #fff;
+  background-color: #f59e0b;
+  padding: 0.6rem 1.4rem;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.nav a:hover {
+  background-color: #d97706;
+  transform: translateY(-2px);
+}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import styles from "./login.module.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -27,17 +28,19 @@ export default function Login() {
       setError(data.message);
     } else {
       localStorage.setItem("token", data.token);
-      router.push("/profile"); 
+      router.push("/profile");
     }
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email</label>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Login</h1>
+
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="email">Email</label>
           <input
+            className={styles.input}
             type="email"
             id="email"
             value={email}
@@ -45,9 +48,11 @@ export default function Login() {
             required
           />
         </div>
-        <div>
-          <label htmlFor="password">Password</label>
+
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="password">Password</label>
           <input
+            className={styles.input}
             type="password"
             id="password"
             value={password}
@@ -55,32 +60,22 @@ export default function Login() {
             required
           />
         </div>
-        <button type="submit">Login</button>
-      </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <div style={{ textAlign: 'center', marginTop: 16 }}>
-        <div style={{ margin: '12px 0', color: '#666' }}>OR</div>
+        <div className={styles.actions}>
+          <button className={styles.primaryButton} type="submit">Login</button>
+        </div>
+      </form>
+
+      {error && <div className={styles.error}>{error}</div>}
+
+      <div className={styles.altBox}>
+        <div className={styles.smallText}>OR</div>
         <button
           type="button"
           onClick={() => (window.location.href = 'http://localhost:5000/api/auth/google')}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '8px 14px',
-            borderRadius: 6,
-            border: '1px solid #ddd',
-            background: '#fff',
-            cursor: 'pointer',
-            fontWeight: 600,
-          }}
+          className={styles.googleButton}
         >
-          <img
-            src="https://www.google.com/favicon.ico"
-            alt="Google"
-            style={{ width: 18, height: 18 }}
-          />
+          <img src="https://www.google.com/favicon.ico" alt="Google" style={{ width: 18, height: 18 }} />
           Continue with Google
         </button>
       </div>
