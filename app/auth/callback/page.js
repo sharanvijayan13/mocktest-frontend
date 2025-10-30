@@ -12,7 +12,7 @@ function AuthCallbackContent() {
 
     if (token) {
       // Store token in localStorage
-      localStorage.setItem('token', token);``
+      localStorage.setItem('token', token);
 
       // Redirect to profile page
       router.push('/profile');
