@@ -34,9 +34,10 @@ export default function Login() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Login</h1>
+      
 
       <form className={styles.form} onSubmit={handleSubmit}>
+      <h1 className={styles.title}>Login</h1>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="email">Email</label>
           <input
@@ -64,7 +65,7 @@ export default function Login() {
         <div className={styles.actions}>
           <button className={styles.primaryButton} type="submit">Login</button>
         </div>
-      </form>
+    
 
       {error && <div className={styles.error}>{error}</div>}
 
@@ -79,6 +80,8 @@ export default function Login() {
           Continue with Google
         </button>
       </div>
+      </form>
     </div>
+    
   );
 }
