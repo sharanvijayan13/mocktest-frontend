@@ -34,10 +34,10 @@ export default function Login() {
 
   return (
     <div className={styles.container}>
-      
+
 
       <form className={styles.form} onSubmit={handleSubmit}>
-      <h1 className={styles.title}>Login</h1>
+        <h1 className={styles.title}>Login</h1>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="email">Email</label>
           <input
@@ -65,23 +65,23 @@ export default function Login() {
         <div className={styles.actions}>
           <button className={styles.primaryButton} type="submit">Login</button>
         </div>
-    
 
-      {error && <div className={styles.error}>{error}</div>}
 
-      <div className={styles.altBox}>
-        <div className={styles.smallText}>OR</div>
-        <button
-          type="button"
-          onClick={() => (window.location.href = 'http://localhost:5000/api/auth/google')}
-          className={styles.googleButton}
-        >
-          <img src="https://www.google.com/favicon.ico" alt="Google" style={{ width: 18, height: 18 }} />
-          Continue with Google
-        </button>
-      </div>
+        {error && <div className={styles.error}>{error}</div>}
+
+        <div className={styles.altBox}>
+          <div className={styles.smallText}>OR</div>
+          <button
+            type="button"
+            onClick={() => (window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/google`)}
+            className={styles.googleButton}
+          >
+            <img src="https://www.google.com/favicon.ico" alt="Google" style={{ width: 18, height: 18 }} />
+            Continue with Google
+          </button>
+        </div>
       </form>
     </div>
-    
+
   );
 }
