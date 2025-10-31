@@ -5,6 +5,18 @@ import { useRouter } from "next/navigation";
 import Navigation from "../../components/Navigation";
 import MobileNavigation from "../../components/MobileNavigation";
 import Labels from "../../components/Labels";
+import { 
+  Lock, 
+  LogIn, 
+  UserPlus, 
+  FileText, 
+  FileEdit, 
+  Edit3, 
+  Trash2, 
+  Send, 
+  Save, 
+  X 
+} from 'lucide-react';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -273,11 +285,20 @@ export default function ProfilePage() {
     return (
       <div className="auth-required">
         <div className="auth-card">
-          <h2>🔐 Authentication Required</h2>
+          <div className="auth-icon">
+            <Lock size={48} />
+          </div>
+          <h2>Authentication Required</h2>
           <p>Please login to access your notes and drafts.</p>
           <div className="auth-actions">
-            <a href="/login" className="btn btn-primary">Login</a>
-            <a href="/signup" className="btn btn-secondary">Sign Up</a>
+            <a href="/login" className="btn btn-primary">
+              <LogIn size={16} />
+              Login
+            </a>
+            <a href="/signup" className="btn btn-secondary">
+              <UserPlus size={16} />
+              Sign Up
+            </a>
           </div>
         </div>
       </div>
@@ -341,7 +362,8 @@ export default function ProfilePage() {
                       onClick={handleSaveDraft}
                       className="btn btn-secondary"
                     >
-                      💾 Save as Draft
+                      <Save size={16} />
+                      Save as Draft
                     </button>
                   )}
 
@@ -351,6 +373,7 @@ export default function ProfilePage() {
                       onClick={clearForm}
                       className="btn btn-secondary"
                     >
+                      <X size={16} />
                       Cancel
                     </button>
                   )}
@@ -367,7 +390,7 @@ export default function ProfilePage() {
                   </div>
                 ) : notes.length === 0 ? (
                   <div className="empty-state">
-                    <div className="empty-icon">📝</div>
+                    <FileText size={48} className="empty-icon" />
                     <h3>No notes yet</h3>
                     <p>Create your first note using the form above!</p>
                   </div>
@@ -383,14 +406,14 @@ export default function ProfilePage() {
                               className="action-btn edit-btn"
                               title="Edit note"
                             >
-                              ✏️
+                              <Edit3 size={16} />
                             </button>
                             <button 
                               onClick={() => handleDelete(note.id, "note")}
                               className="action-btn delete-btn"
                               title="Delete note"
                             >
-                              🗑️
+                              <Trash2 size={16} />
                             </button>
                           </div>
                         </div>
@@ -411,7 +434,7 @@ export default function ProfilePage() {
               ) : activeTab === "drafts" ? (
                 drafts.length === 0 ? (
                   <div className="empty-state">
-                    <div className="empty-icon">📄</div>
+                    <FileEdit size={48} className="empty-icon" />
                     <h3>No drafts yet</h3>
                     <p>Save a note as draft from the Notes tab to see it here!</p>
                   </div>
@@ -427,21 +450,21 @@ export default function ProfilePage() {
                               className="action-btn publish-btn"
                               title="Publish draft"
                             >
-                              🚀
+                              <Send size={16} />
                             </button>
                             <button 
                               onClick={() => handleEdit(draft, "draft")}
                               className="action-btn edit-btn"
                               title="Edit draft"
                             >
-                              ✏️
+                              <Edit3 size={16} />
                             </button>
                             <button 
                               onClick={() => handleDelete(draft.id, "draft")}
                               className="action-btn delete-btn"
                               title="Delete draft"
                             >
-                              🗑️
+                              <Trash2 size={16} />
                             </button>
                           </div>
                         </div>
@@ -499,6 +522,11 @@ export default function ProfilePage() {
           text-align: center;
           max-width: 400px;
           width: 100%;
+        }
+
+        .auth-icon {
+          color: var(--text-muted);
+          margin-bottom: 1rem;
         }
 
         .auth-card h2 {
@@ -587,7 +615,7 @@ export default function ProfilePage() {
         }
 
         .empty-icon {
-          font-size: 3rem;
+          color: var(--text-muted);
           margin-bottom: 1rem;
         }
 
@@ -657,18 +685,26 @@ export default function ProfilePage() {
           cursor: pointer;
           transition: all 0.2s ease;
           font-size: 0.875rem;
+          color: var(--text-muted);
+        }
+
+        .action-btn:hover {
+          color: var(--text-primary);
         }
 
         .edit-btn:hover {
           background: rgba(59, 130, 246, 0.1);
+          color: var(--accent-primary);
         }
 
         .delete-btn:hover {
           background: rgba(239, 68, 68, 0.1);
+          color: var(--error);
         }
 
         .publish-btn:hover {
           background: rgba(16, 185, 129, 0.1);
+          color: var(--success);
         }
 
         .note-body {

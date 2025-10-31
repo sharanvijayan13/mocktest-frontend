@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../../contexts/ThemeContext";
+import { BookOpen, Sun, Moon, Loader2 } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -44,13 +45,16 @@ export default function Login() {
   return (
     <div className="auth-container">
       <div className="auth-header">
-        <h1>📚 MiniSamantha</h1>
+        <div className="brand">
+          <BookOpen size={24} />
+          <h1>MiniSamantha</h1>
+        </div>
         <button
           onClick={toggleTheme}
           className="theme-toggle"
           title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
         >
-          {theme === 'light' ? '🌙' : '☀️'}
+          {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
         </button>
       </div>
 
@@ -98,7 +102,7 @@ export default function Login() {
           >
             {isLoading ? (
               <>
-                <span className="loading-spinner"></span>
+                <Loader2 size={16} className="loading-spinner" />
                 Signing in...
               </>
             ) : (
@@ -149,6 +153,13 @@ export default function Login() {
           margin-bottom: 2rem;
         }
 
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: var(--text-primary);
+        }
+
         .auth-header h1 {
           font-size: 1.5rem;
           font-weight: 600;
@@ -164,6 +175,7 @@ export default function Login() {
           cursor: pointer;
           transition: all 0.2s ease;
           border: 1px solid var(--border-primary);
+          color: var(--text-primary);
         }
 
         .theme-toggle:hover {
@@ -211,12 +223,6 @@ export default function Login() {
         }
 
         .loading-spinner {
-          display: inline-block;
-          width: 1rem;
-          height: 1rem;
-          border: 2px solid transparent;
-          border-top: 2px solid currentColor;
-          border-radius: 50%;
           animation: spin 1s linear infinite;
           margin-right: 0.5rem;
         }

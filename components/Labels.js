@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { Tag, Plus, Edit2, Trash2, Lightbulb } from 'lucide-react';
 
 export default function Labels() {
   const [labels, setLabels] = useState([
@@ -40,7 +41,10 @@ export default function Labels() {
   return (
     <div className="labels-container">
       <div className="labels-header">
-        <h2>🏷️ Labels</h2>
+        <div className="labels-title">
+          <Tag size={24} />
+          <h2>Labels</h2>
+        </div>
         <p className="labels-description">
           Organize your notes with custom labels. Create, edit, and manage your label system.
         </p>
@@ -71,6 +75,7 @@ export default function Labels() {
           </div>
           
           <button type="submit" className="add-label-btn">
+            <Plus size={16} />
             Add Label
           </button>
         </div>
@@ -79,7 +84,7 @@ export default function Labels() {
       <div className="labels-list">
         {labels.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">🏷️</div>
+            <Tag size={48} className="empty-icon" />
             <h3>No labels yet</h3>
             <p>Create your first label to start organizing your notes!</p>
           </div>
@@ -103,14 +108,14 @@ export default function Labels() {
                     className="edit-btn"
                     title="Edit label"
                   >
-                    ✏️
+                    <Edit2 size={14} />
                   </button>
                   <button 
                     className="delete-btn"
                     onClick={() => handleDeleteLabel(label.id)}
                     title="Delete label"
                   >
-                    🗑️
+                    <Trash2 size={14} />
                   </button>
                 </div>
               </div>
@@ -120,7 +125,10 @@ export default function Labels() {
       </div>
 
       <div className="labels-info">
-        <h3>💡 Tips</h3>
+        <div className="info-title">
+          <Lightbulb size={20} />
+          <h3>Tips</h3>
+        </div>
         <ul>
           <li>Labels help you categorize and find notes quickly</li>
           <li>You can assign multiple labels to a single note</li>
@@ -140,11 +148,17 @@ export default function Labels() {
           margin-bottom: 2rem;
         }
 
+        .labels-title {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.5rem;
+        }
+
         .labels-header h2 {
           font-size: 1.5rem;
           font-weight: 600;
           color: var(--text-primary);
-          margin-bottom: 0.5rem;
         }
 
         .labels-description {
@@ -205,6 +219,9 @@ export default function Labels() {
         }
 
         .add-label-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
           padding: 0.75rem 1.5rem;
           background: var(--accent-primary);
           color: white;
@@ -233,7 +250,7 @@ export default function Labels() {
         }
 
         .empty-icon {
-          font-size: 3rem;
+          color: var(--text-muted);
           margin-bottom: 1rem;
         }
 
@@ -311,14 +328,17 @@ export default function Labels() {
           border-radius: 4px;
           transition: all 0.2s ease;
           font-size: 0.875rem;
+          color: var(--text-muted);
         }
 
         .edit-btn:hover {
           background: var(--bg-tertiary);
+          color: var(--accent-primary);
         }
 
         .delete-btn:hover {
           background: rgba(239, 68, 68, 0.1);
+          color: var(--error);
         }
 
         .labels-info {
@@ -328,9 +348,15 @@ export default function Labels() {
           padding: 1.5rem;
         }
 
+        .info-title {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 1rem;
+        }
+
         .labels-info h3 {
           color: var(--text-primary);
-          margin-bottom: 1rem;
           font-size: 1rem;
         }
 

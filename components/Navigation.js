@@ -2,6 +2,17 @@
 
 import { useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
+import { 
+  FileText, 
+  FileEdit, 
+  Tag, 
+  Sun, 
+  Moon, 
+  Menu, 
+  X, 
+  LogOut,
+  BookOpen
+} from 'lucide-react';
 
 export default function Navigation({ 
   activeTab, 
@@ -15,9 +26,9 @@ export default function Navigation({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { id: 'notes', label: 'Notes', count: notesCount, icon: '📝' },
-    { id: 'drafts', label: 'Drafts', count: draftsCount, icon: '📄' },
-    { id: 'labels', label: 'Labels', count: 0, icon: '🏷️' },
+    { id: 'notes', label: 'Notes', count: notesCount, icon: FileText },
+    { id: 'drafts', label: 'Drafts', count: draftsCount, icon: FileEdit },
+    { id: 'labels', label: 'Labels', count: 0, icon: Tag },
   ];
 
   return (
@@ -25,23 +36,27 @@ export default function Navigation({
       {/* Desktop Navigation */}
       <div className="nav-desktop">
         <div className="nav-brand">
-          <h1>📚 MiniSamantha</h1>
+          <BookOpen size={24} />
+          <h1>MiniSamantha</h1>
         </div>
 
         <div className="nav-tabs">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`nav-tab ${activeTab === item.id ? 'nav-tab-active' : ''}`}
-            >
-              <span className="nav-tab-icon">{item.icon}</span>
-              <span className="nav-tab-label">{item.label}</span>
-              {item.count > 0 && (
-                <span className="nav-tab-count">{item.count}</span>
-              )}
-            </button>
-          ))}
+          {navItems.map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`nav-tab ${activeTab === item.id ? 'nav-tab-active' : ''}`}
+              >
+                <IconComponent size={18} className="nav-tab-icon" />
+                <span className="nav-tab-label">{item.label}</span>
+                {item.count > 0 && (
+                  <span className="nav-tab-count">{item.count}</span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         <div className="nav-actions">
@@ -50,7 +65,7 @@ export default function Navigation({
             className="theme-toggle"
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
           >
-            {theme === 'light' ? '🌙' : '☀️'}
+            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
           </button>
 
           {profile && (
@@ -60,6 +75,7 @@ export default function Navigation({
                 <span className="profile-email">{profile.email}</span>
               </div>
               <button onClick={onLogout} className="logout-btn">
+                <LogOut size={16} />
                 Logout
               </button>
             </div>
@@ -70,20 +86,23 @@ export default function Navigation({
       {/* Mobile Navigation */}
       <div className="nav-mobile">
         <div className="nav-mobile-header">
-          <h1>📚 MiniSamantha</h1>
+          <div className="nav-mobile-brand">
+            <BookOpen size={20} />
+            <h1>MiniSamantha</h1>
+          </div>
           <div className="nav-mobile-actions">
             <button
               onClick={toggleTheme}
               className="theme-toggle"
               title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
             >
-              {theme === 'light' ? '🌙' : '☀️'}
+              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
             </button>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="mobile-menu-toggle"
             >
-              {isMobileMenuOpen ? '✕' : '☰'}
+              {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </div>
@@ -91,22 +110,25 @@ export default function Navigation({
         {isMobileMenuOpen && (
           <div className="nav-mobile-menu">
             <div className="nav-mobile-tabs">
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveTab(item.id);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`nav-mobile-tab ${activeTab === item.id ? 'nav-mobile-tab-active' : ''}`}
-                >
-                  <span className="nav-tab-icon">{item.icon}</span>
-                  <span className="nav-tab-label">{item.label}</span>
-                  {item.count > 0 && (
-                    <span className="nav-tab-count">{item.count}</span>
-                  )}
-                </button>
-              ))}
+              {navItems.map((item) => {
+                const IconComponent = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`nav-mobile-tab ${activeTab === item.id ? 'nav-mobile-tab-active' : ''}`}
+                  >
+                    <IconComponent size={18} className="nav-tab-icon" />
+                    <span className="nav-tab-label">{item.label}</span>
+                    {item.count > 0 && (
+                      <span className="nav-tab-count">{item.count}</span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             {profile && (
@@ -116,6 +138,7 @@ export default function Navigation({
                   <span className="profile-email">{profile.email}</span>
                 </div>
                 <button onClick={onLogout} className="logout-btn">
+                  <LogOut size={16} />
                   Logout
                 </button>
               </div>
@@ -140,6 +163,13 @@ export default function Navigation({
           padding: 1rem 2rem;
           max-width: 1200px;
           margin: 0 auto;
+        }
+
+        .nav-brand {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: var(--text-primary);
         }
 
         .nav-brand h1 {
@@ -183,7 +213,8 @@ export default function Navigation({
         }
 
         .nav-tab-icon {
-          font-size: 1rem;
+          flex-shrink: 0;
+          color: inherit;
         }
 
         .nav-tab-count {
@@ -216,6 +247,7 @@ export default function Navigation({
           font-size: 1.125rem;
           cursor: pointer;
           transition: all 0.2s ease;
+          color: var(--text-primary);
         }
 
         .theme-toggle:hover {
@@ -246,6 +278,9 @@ export default function Navigation({
         }
 
         .logout-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
           padding: 0.5rem 1rem;
           border: 1px solid var(--border-primary);
           background: var(--bg-primary);
@@ -274,6 +309,13 @@ export default function Navigation({
           padding: 1rem;
         }
 
+        .nav-mobile-brand {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: var(--text-primary);
+        }
+
         .nav-mobile-header h1 {
           font-size: 1.125rem;
           font-weight: 600;
@@ -294,6 +336,7 @@ export default function Navigation({
           font-size: 1.125rem;
           cursor: pointer;
           transition: all 0.2s ease;
+          color: var(--text-primary);
         }
 
         .mobile-menu-toggle:hover {

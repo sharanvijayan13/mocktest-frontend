@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { FileText, FileEdit, Tag } from 'lucide-react';
 
 export default function MobileNavigation({ 
   activeTab, 
@@ -12,9 +13,9 @@ export default function MobileNavigation({
   const [lastScrollY, setLastScrollY] = useState(0);
 
   const navItems = [
-    { id: 'notes', label: 'Notes', count: notesCount, icon: '📝' },
-    { id: 'drafts', label: 'Drafts', count: draftsCount, icon: '📄' },
-    { id: 'labels', label: 'Labels', count: 0, icon: '🏷️' },
+    { id: 'notes', label: 'Notes', count: notesCount, icon: FileText },
+    { id: 'drafts', label: 'Drafts', count: draftsCount, icon: FileEdit },
+    { id: 'labels', label: 'Labels', count: 0, icon: Tag },
   ];
 
   useEffect(() => {
@@ -37,19 +38,22 @@ export default function MobileNavigation({
   return (
     <nav className={`mobile-nav ${isVisible ? 'mobile-nav-visible' : 'mobile-nav-hidden'}`}>
       <div className="mobile-nav-content">
-        {navItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setActiveTab(item.id)}
-            className={`mobile-nav-item ${activeTab === item.id ? 'mobile-nav-item-active' : ''}`}
-          >
-            <span className="mobile-nav-icon">{item.icon}</span>
-            <span className="mobile-nav-label">{item.label}</span>
-            {item.count > 0 && (
-              <span className="mobile-nav-badge">{item.count}</span>
-            )}
-          </button>
-        ))}
+        {navItems.map((item) => {
+          const IconComponent = item.icon;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`mobile-nav-item ${activeTab === item.id ? 'mobile-nav-item-active' : ''}`}
+            >
+              <IconComponent size={20} className="mobile-nav-icon" />
+              <span className="mobile-nav-label">{item.label}</span>
+              {item.count > 0 && (
+                <span className="mobile-nav-badge">{item.count}</span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       <style jsx>{`
@@ -115,7 +119,8 @@ export default function MobileNavigation({
         }
 
         .mobile-nav-icon {
-          font-size: 1.25rem;
+          flex-shrink: 0;
+          color: inherit;
         }
 
         .mobile-nav-label {

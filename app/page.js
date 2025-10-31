@@ -2,6 +2,18 @@
 
 import Link from "next/link";
 import { useTheme } from "../contexts/ThemeContext";
+import { 
+  BookOpen, 
+  Sun, 
+  Moon, 
+  FileText, 
+  FileEdit, 
+  Tag, 
+  Zap, 
+  Save, 
+  Palette, 
+  ArrowRight 
+} from 'lucide-react';
 import "./globals.css";
 
 export default function Home() {
@@ -11,13 +23,16 @@ export default function Home() {
     <div className="home-container">
       <header className="home-header">
         <div className="header-content">
-          <h1>📚 MiniSamantha</h1>
+          <div className="brand">
+            <BookOpen size={24} />
+            <h1>MiniSamantha</h1>
+          </div>
           <button
             onClick={toggleTheme}
             className="theme-toggle"
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
           >
-            {theme === 'light' ? '🌙' : '☀️'}
+            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
           </button>
         </div>
       </header>
@@ -35,19 +50,19 @@ export default function Home() {
             
             <div className="hero-features">
               <div className="feature">
-                <span className="feature-icon">📝</span>
+                <FileText size={20} className="feature-icon" />
                 <span>Create & Edit Notes</span>
               </div>
               <div className="feature">
-                <span className="feature-icon">📄</span>
+                <FileEdit size={20} className="feature-icon" />
                 <span>Save as Drafts</span>
               </div>
               <div className="feature">
-                <span className="feature-icon">🏷️</span>
+                <Tag size={20} className="feature-icon" />
                 <span>Organize with Labels</span>
               </div>
               <div className="feature">
-                <span className="feature-icon">🌙</span>
+                <Palette size={20} className="feature-icon" />
                 <span>Dark & Light Themes</span>
               </div>
             </div>
@@ -55,6 +70,7 @@ export default function Home() {
             <div className="hero-actions">
               <Link href="/signup" className="btn btn-primary btn-large">
                 Get Started
+                <ArrowRight size={16} />
               </Link>
               <Link href="/login" className="btn btn-secondary btn-large">
                 Sign In
@@ -66,15 +82,24 @@ export default function Home() {
         <div className="info-section">
           <div className="info-grid">
             <div className="info-card">
-              <h3>🚀 Quick & Easy</h3>
+              <div className="info-icon">
+                <Zap size={24} />
+              </div>
+              <h3>Quick & Easy</h3>
               <p>Start writing immediately with our clean, distraction-free interface.</p>
             </div>
             <div className="info-card">
-              <h3>💾 Never Lose Work</h3>
+              <div className="info-icon">
+                <Save size={24} />
+              </div>
+              <h3>Never Lose Work</h3>
               <p>Save drafts automatically and publish when you're ready.</p>
             </div>
             <div className="info-card">
-              <h3>🎨 Beautiful Design</h3>
+              <div className="info-icon">
+                <Palette size={24} />
+              </div>
+              <h3>Beautiful Design</h3>
               <p>Enjoy a modern interface that adapts to your preferred theme.</p>
             </div>
           </div>
@@ -108,6 +133,13 @@ export default function Home() {
           align-items: center;
         }
 
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: var(--text-primary);
+        }
+
         .header-content h1 {
           font-size: 1.5rem;
           font-weight: 600;
@@ -123,6 +155,7 @@ export default function Home() {
           cursor: pointer;
           transition: all 0.2s ease;
           border: 1px solid var(--border-primary);
+          color: var(--text-primary);
         }
 
         .theme-toggle:hover {
@@ -181,7 +214,8 @@ export default function Home() {
         }
 
         .feature-icon {
-          font-size: 1.25rem;
+          flex-shrink: 0;
+          color: var(--accent-primary);
         }
 
         .hero-actions {
@@ -222,6 +256,11 @@ export default function Home() {
         .info-card:hover {
           border-color: var(--border-secondary);
           box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .info-icon {
+          color: var(--accent-primary);
+          margin-bottom: 1rem;
         }
 
         .info-card h3 {
