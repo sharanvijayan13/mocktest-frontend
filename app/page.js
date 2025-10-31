@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
+import LogoutButton from "../components/LogoutButton";
 import { 
   BookOpen, 
   Sun, 
@@ -18,6 +20,13 @@ import "./globals.css";
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
 
   return (
     <div className="home-container">
@@ -27,13 +36,19 @@ export default function Home() {
             <BookOpen size={24} />
             <h1>MiniSamantha</h1>
           </div>
-          <button
-            onClick={toggleTheme}
-            className="theme-toggle"
-            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
-          >
-            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-          </button>
+          <div className="header-actions">
+            <button
+              onClick={toggleTheme}
+              className="theme-toggle"
+              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+            >
+              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+            </button>
+            
+            {isLoggedIn && (
+              <LogoutButton variant="simple" />
+            )}
+          </div>
         </div>
       </header>
 
@@ -68,13 +83,22 @@ export default function Home() {
             </div>
 
             <div className="hero-actions">
-              <Link href="/signup" className="btn btn-primary btn-large">
-                Get Started
-                <ArrowRight size={16} />
-              </Link>
-              <Link href="/login" className="btn btn-secondary btn-large">
-                Sign In
-              </Link>
+              {isLoggedIn ? (
+                <Link href="/profile" className="btn btn-primary btn-large">
+                  Go to Notes
+                  <ArrowRight size={16} />
+                </Link>
+              ) : (
+                <>
+                  <Link href="/signup" className="btn btn-primary btn-large">
+                    Get Started
+                    <ArrowRight size={16} />
+                  </Link>
+                  <Link href="/login" className="btn btn-secondary btn-large">
+                    Sign In
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -107,7 +131,7 @@ export default function Home() {
       </main>
 
       <footer className="home-footer">
-        <p>&copy; 2024 MiniSamantha. Built with ❤️ for note-takers everywhere.</p>
+        <p>&copy; 2025 MiniSamantha. All rights reserved.</p>
       </footer>
 
       <style jsx>{`
@@ -131,6 +155,12 @@ export default function Home() {
           display: flex;
           justify-content: space-between;
           align-items: center;
+        }
+
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
         }
 
         .brand {

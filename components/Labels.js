@@ -2,13 +2,11 @@
 
 import { useState } from 'react';
 import { Tag, Plus, Edit2, Trash2, Lightbulb } from 'lucide-react';
+import { useLabels } from '../contexts/LabelsContext';
 
 export default function Labels() {
-  const [labels, setLabels] = useState([
-    { id: 1, name: 'Work', color: '#3b82f6', count: 5 },
-    { id: 2, name: 'Personal', color: '#10b981', count: 3 },
-    { id: 3, name: 'Ideas', color: '#f59e0b', count: 8 },
-  ]);
+  const { availableLabels, addLabel, deleteLabel } = useLabels();
+  const labels = availableLabels.map(label => ({ ...label, count: 0 })); // Add count for display
   const [newLabel, setNewLabel] = useState('');
   const [selectedColor, setSelectedColor] = useState('#3b82f6');
 
@@ -24,17 +22,16 @@ export default function Labels() {
     const label = {
       id: Date.now(),
       name: newLabel.trim(),
-      color: selectedColor,
-      count: 0
+      color: selectedColor
     };
 
-    setLabels([...labels, label]);
+    addLabel(label);
     setNewLabel('');
   };
 
   const handleDeleteLabel = (id) => {
     if (confirm('Delete this label? This will remove it from all notes.')) {
-      setLabels(labels.filter(l => l.id !== id));
+      deleteLabel(id);
     }
   };
 
@@ -133,7 +130,8 @@ export default function Labels() {
           <li>Labels help you categorize and find notes quickly</li>
           <li>You can assign multiple labels to a single note</li>
           <li>Use colors to create visual organization</li>
-          <li>Labels are coming soon to the note editor!</li>
+          <li>Labels are now available in the note editor!</li>
+          <li>Create custom labels or use the predefined ones</li>
         </ul>
       </div>
 

@@ -5,17 +5,18 @@ import { useRouter } from "next/navigation";
 import Navigation from "../../components/Navigation";
 import MobileNavigation from "../../components/MobileNavigation";
 import Labels from "../../components/Labels";
-import { 
-  Lock, 
-  LogIn, 
-  UserPlus, 
-  FileText, 
-  FileEdit, 
-  Edit3, 
-  Trash2, 
-  Send, 
-  Save, 
-  X 
+import LabelSelector from "../../components/LabelSelector";
+import {
+  Lock,
+  LogIn,
+  UserPlus,
+  FileText,
+  FileEdit,
+  Edit3,
+  Trash2,
+  Send,
+  Save,
+  X
 } from 'lucide-react';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -32,6 +33,7 @@ export default function ProfilePage() {
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [selectedLabels, setSelectedLabels] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editingType, setEditingType] = useState(null);
   const [showDraftButton, setShowDraftButton] = useState(false);
@@ -73,10 +75,14 @@ export default function ProfilePage() {
       });
       if (!res.ok) throw new Error("Failed to fetch notes");
       const data = await res.json();
-      
+      console.log('📥 Fetched notes raw data:', data);
+
       // Handle both old array format and new paginated format
       const notesData = Array.isArray(data) ? data : (data.data || []);
-      setNotes(notesData.filter(post => !post.is_draft));
+      console.log('📝 Processed notes data:', notesData);
+      const filteredNotes = notesData.filter(post => !post.is_draft);
+      console.log('📝 Filtered notes (published only):', filteredNotes);
+      setNotes(filteredNotes);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -89,9 +95,9 @@ export default function ProfilePage() {
       const res = await fetch(`${BACKEND}/api/posts/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       if (!res.ok) throw new Error("Failed to fetch drafts");
-      
+
       const data = await res.json();
       const draftsData = Array.isArray(data) ? data : (data.data || []);
       setDrafts(draftsData.filter(post => post.is_draft));
@@ -105,20 +111,26 @@ export default function ProfilePage() {
     setError("");
     if (!title || !body) return setError("Please provide title and body");
 
+    // Debug logging
+    console.log('🔍 Creating/updating note with labels:', selectedLabels);
+
     try {
       if (editingId) {
+        const requestData = {
+          title,
+          body,
+          labels: selectedLabels,
+          is_draft: editingType === "draft" ? false : undefined
+        };
+        console.log('📤 Update request data:', requestData);
+
         const res = await fetch(`${BACKEND}/api/posts/${editingId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            title,
-            body,
-            // tags: selectedTags,
-            is_draft: editingType === "draft" ? false : undefined
-          }),
+          body: JSON.stringify(requestData),
         });
 
         if (!res.ok) {
@@ -137,11 +149,14 @@ export default function ProfilePage() {
 
         clearForm();
       } else {
-        const postData = { title, body, is_draft: false };
-        // if (selectedTags && selectedTags.length > 0) {
-        //   postData.tags = selectedTags;
-        // }
-        
+        const postData = {
+          title,
+          body,
+          is_draft: false,
+          labels: selectedLabels
+        };
+        console.log('📤 Create request data:', postData);
+
         const res = await fetch(`${BACKEND}/api/posts`, {
           method: "POST",
           headers: {
@@ -157,6 +172,7 @@ export default function ProfilePage() {
         }
 
         const data = await res.json();
+        console.log('✅ Note created with response:', data);
         setNotes(prev => [data, ...prev]);
         clearForm();
       }
@@ -169,10 +185,13 @@ export default function ProfilePage() {
     setError("");
     if (!title || !body) return setError("Please provide title and body");
 
-    const requestData = { title, body, is_draft: true };
-    // if (selectedTags && selectedTags.length > 0) {
-    //   requestData.tags = selectedTags;
-    // }
+    const requestData = {
+      title,
+      body,
+      is_draft: true,
+      labels: selectedLabels
+    };
+    console.log('📤 Draft request data:', requestData);
 
     try {
       const res = await fetch(`${BACKEND}/api/posts`, {
@@ -190,6 +209,7 @@ export default function ProfilePage() {
       }
 
       const data = await res.json();
+      console.log('✅ Draft created with response:', data);
       setDrafts(prev => [data, ...prev]);
       clearForm();
       setActiveTab("drafts");
@@ -201,7 +221,7 @@ export default function ProfilePage() {
   const clearForm = () => {
     setTitle("");
     setBody("");
-    // setSelectedTags([]);
+    setSelectedLabels([]);
     setEditingId(null);
     setEditingType(null);
   };
@@ -209,7 +229,7 @@ export default function ProfilePage() {
   const handleEdit = (item, type = "note") => {
     setTitle(item.title || "");
     setBody(item.body || "");
-    // setSelectedTags(item.tags || []);
+    setSelectedLabels(item.labels || []);
     setEditingId(item.id);
     setEditingType(type);
     setActiveTab("notes");
@@ -223,7 +243,7 @@ export default function ProfilePage() {
     try {
       const res = await fetch(`${BACKEND}/api/posts/${id}`, {
         method: "DELETE",
-        headers: { 
+        headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json"
         },
@@ -238,7 +258,7 @@ export default function ProfilePage() {
       } else {
         setNotes(prev => prev.filter(n => n.id !== id));
       }
-      
+
     } catch (err) {
       setError(`Failed to delete ${itemType}: ${err.message}`);
     }
@@ -255,6 +275,7 @@ export default function ProfilePage() {
         body: JSON.stringify({
           title: draft.title,
           body: draft.body,
+          labels: draft.labels || [],
           is_draft: false
         }),
       });
@@ -278,7 +299,7 @@ export default function ProfilePage() {
     setProfile(null);
     setNotes([]);
     setDrafts([]);
-    router.push("/login");
+    router.push("/"); // Redirect to home page instead of login
   }, [router]);
 
   if (!token) {
@@ -329,7 +350,7 @@ export default function ProfilePage() {
                 <div className="form-header">
                   <h2>{editingId ? (editingType === "draft" ? "Edit Draft" : "Edit Note") : "Create New Note"}</h2>
                 </div>
-                
+
                 <div className="form-group">
                   <input
                     className="form-input"
@@ -338,7 +359,7 @@ export default function ProfilePage() {
                     onChange={(e) => setTitle(e.target.value)}
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <textarea
                     className="form-input form-textarea"
@@ -346,6 +367,13 @@ export default function ProfilePage() {
                     value={body}
                     onChange={(e) => setBody(e.target.value)}
                     rows={6}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <LabelSelector
+                    selectedLabels={selectedLabels}
+                    onLabelsChange={setSelectedLabels}
                   />
                 </div>
 
@@ -392,7 +420,7 @@ export default function ProfilePage() {
                   <div className="empty-state">
                     <FileText size={48} className="empty-icon" />
                     <h3>No notes yet</h3>
-                    <p>Create your first note using the form above!</p>
+                    <p>Create your first note.</p>
                   </div>
                 ) : (
                   <div className="notes-grid">
@@ -401,14 +429,14 @@ export default function ProfilePage() {
                         <div className="note-header">
                           <h3 className="note-title">{note.title}</h3>
                           <div className="note-actions">
-                            <button 
+                            <button
                               onClick={() => handleEdit(note, "note")}
                               className="action-btn edit-btn"
                               title="Edit note"
                             >
                               <Edit3 size={16} />
                             </button>
-                            <button 
+                            <button
                               onClick={() => handleDelete(note.id, "note")}
                               className="action-btn delete-btn"
                               title="Delete note"
@@ -417,11 +445,27 @@ export default function ProfilePage() {
                             </button>
                           </div>
                         </div>
-                        
+
                         <div className="note-body">
                           {note.body}
                         </div>
-                        
+
+                        {/* Debug: Check note labels */}
+                        {console.log('🔍 Note object:', note.title, 'Labels:', note.labels, 'Type:', typeof note.labels)}
+                        {note.labels && note.labels.length > 0 && (
+                          <div className="note-labels">
+                            {note.labels.map((label) => (
+                              <span
+                                key={label.id}
+                                className="note-label"
+                                style={{ backgroundColor: label.color }}
+                              >
+                                {label.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
                         <div className="note-meta">
                           <span className="note-date">
                             {new Date(note.created_at).toLocaleDateString()}
@@ -452,14 +496,14 @@ export default function ProfilePage() {
                             >
                               <Send size={16} />
                             </button>
-                            <button 
+                            <button
                               onClick={() => handleEdit(draft, "draft")}
                               className="action-btn edit-btn"
                               title="Edit draft"
                             >
                               <Edit3 size={16} />
                             </button>
-                            <button 
+                            <button
                               onClick={() => handleDelete(draft.id, "draft")}
                               className="action-btn delete-btn"
                               title="Delete draft"
@@ -468,11 +512,25 @@ export default function ProfilePage() {
                             </button>
                           </div>
                         </div>
-                        
+
                         <div className="note-body">
                           {draft.body}
                         </div>
-                        
+
+                        {draft.labels && draft.labels.length > 0 && (
+                          <div className="note-labels">
+                            {draft.labels.map((label) => (
+                              <span
+                                key={label.id}
+                                className="note-label"
+                                style={{ backgroundColor: label.color }}
+                              >
+                                {label.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
                         <div className="note-meta">
                           <span className="draft-badge">DRAFT</span>
                           <span className="note-date">
@@ -738,6 +796,24 @@ export default function ProfilePage() {
 
         .note-date {
           font-size: 0.75rem;
+        }
+
+        .note-labels {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.375rem;
+          margin-bottom: 1rem;
+        }
+
+        .note-label {
+          display: inline-block;
+          padding: 0.125rem 0.5rem;
+          border-radius: 12px;
+          font-size: 0.625rem;
+          font-weight: 600;
+          color: white;
+          text-transform: uppercase;
+          letter-spacing: 0.025em;
         }
 
         @media (max-width: 768px) {

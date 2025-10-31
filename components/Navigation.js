@@ -68,7 +68,7 @@ export default function Navigation({
             {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
           </button>
 
-          {profile && (
+          {profile ? (
             <div className="profile-menu">
               <div className="profile-info">
                 <span className="profile-name">{profile.name}</span>
@@ -79,6 +79,12 @@ export default function Navigation({
                 Logout
               </button>
             </div>
+          ) : onLogout && (
+            // Fallback logout button if profile is not loaded but logout function exists
+            <button onClick={onLogout} className="logout-btn logout-btn-simple">
+              <LogOut size={16} />
+              Logout
+            </button>
           )}
         </div>
       </div>
@@ -131,13 +137,21 @@ export default function Navigation({
               })}
             </div>
 
-            {profile && (
+            {profile ? (
               <div className="nav-mobile-profile">
                 <div className="profile-info">
                   <span className="profile-name">{profile.name}</span>
                   <span className="profile-email">{profile.email}</span>
                 </div>
                 <button onClick={onLogout} className="logout-btn">
+                  <LogOut size={16} />
+                  Logout
+                </button>
+              </div>
+            ) : onLogout && (
+              // Fallback logout for mobile
+              <div className="nav-mobile-profile">
+                <button onClick={onLogout} className="logout-btn logout-btn-simple">
                   <LogOut size={16} />
                   Logout
                 </button>
@@ -295,6 +309,17 @@ export default function Navigation({
           background: var(--error);
           color: white;
           border-color: var(--error);
+        }
+
+        .logout-btn-simple {
+          background: var(--error);
+          color: white;
+          border-color: var(--error);
+        }
+
+        .logout-btn-simple:hover {
+          background: #dc2626;
+          border-color: #dc2626;
         }
 
         /* Mobile Navigation */
