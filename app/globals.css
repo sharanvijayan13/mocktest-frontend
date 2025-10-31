@@ -120,7 +120,9 @@ button:disabled {
 }
 
 /* Input Base Styles */
-input, textarea, select {
+input,
+textarea,
+select {
   font-family: inherit;
   transition: all 0.2s ease;
 }
@@ -266,11 +268,11 @@ a:hover {
   .container {
     padding: 0 0.75rem;
   }
-  
+
   .card {
     padding: 1rem;
   }
-  
+
   .btn {
     padding: 0.625rem 1rem;
     font-size: 0.875rem;

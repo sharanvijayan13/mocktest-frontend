@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "npm run test:integration",
+    "test:integration": "node tests/integration/test_basic_functionality.js",
+    "test:labels": "node tests/integration/test_labels_frontend.js",
+    "test:debug": "node tests/debug/debug_current_state.js",
+    "test:all": "npm run test:integration && npm run test:labels"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.10.0",
