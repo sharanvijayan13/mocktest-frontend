@@ -27,9 +27,10 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [notes, setNotes] = useState([]);
   const [drafts, setDrafts] = useState([]);
+  const [privateNotes, setPrivateNotes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState("notes");
+  const [activeTab, setActiveTab] = useState("all");
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -37,6 +38,7 @@ export default function ProfilePage() {
   const [editingId, setEditingId] = useState(null);
   const [editingType, setEditingType] = useState(null);
   const [showDraftButton, setShowDraftButton] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(false);
 
   useEffect(() => {
     const t = localStorage.getItem("token");
@@ -48,6 +50,7 @@ export default function ProfilePage() {
     fetchProfile();
     fetchNotes();
     fetchDrafts();
+    fetchPrivateNotes();
   }, [token]);
 
   useEffect(() => {
@@ -75,14 +78,11 @@ export default function ProfilePage() {
       });
       if (!res.ok) throw new Error("Failed to fetch notes");
       const data = await res.json();
-      console.log('📥 Fetched notes raw data:', data);
+      console.log('📥 Fetched public notes:', data);
 
-      // Handle both old array format and new paginated format
+      // This now returns only public notes (not drafts, not private)
       const notesData = Array.isArray(data) ? data : (data.data || []);
-      console.log('📝 Processed notes data:', notesData);
-      const filteredNotes = notesData.filter(post => !post.is_draft);
-      console.log('📝 Filtered notes (published only):', filteredNotes);
-      setNotes(filteredNotes);
+      setNotes(notesData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -92,7 +92,7 @@ export default function ProfilePage() {
 
   const fetchDrafts = async () => {
     try {
-      const res = await fetch(`${BACKEND}/api/posts/me`, {
+      const res = await fetch(`${BACKEND}/api/drafts/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -100,7 +100,23 @@ export default function ProfilePage() {
 
       const data = await res.json();
       const draftsData = Array.isArray(data) ? data : (data.data || []);
-      setDrafts(draftsData.filter(post => post.is_draft));
+      setDrafts(draftsData);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const fetchPrivateNotes = async () => {
+    try {
+      const res = await fetch(`${BACKEND}/api/private/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch private notes");
+
+      const data = await res.json();
+      const privateData = Array.isArray(data) ? data : (data.data || []);
+      setPrivateNotes(privateData);
     } catch (err) {
       setError(err.message);
     }
@@ -142,7 +158,13 @@ export default function ProfilePage() {
 
         if (editingType === "draft") {
           setDrafts(prev => prev.filter(d => d.id !== editingId));
-          setNotes(prev => [data, ...prev]);
+          if (data.is_private) {
+            setPrivateNotes(prev => [data, ...prev]);
+          } else {
+            setNotes(prev => [data, ...prev]);
+          }
+        } else if (editingType === "private") {
+          setPrivateNotes(prev => prev.map(n => n.id === editingId ? data : n));
         } else {
           setNotes(prev => prev.map(n => n.id === editingId ? data : n));
         }
@@ -153,6 +175,7 @@ export default function ProfilePage() {
           title,
           body,
           is_draft: false,
+          is_private: isPrivate,
           labels: selectedLabels
         };
         console.log('📤 Create request data:', postData);
@@ -173,7 +196,12 @@ export default function ProfilePage() {
 
         const data = await res.json();
         console.log('✅ Note created with response:', data);
-        setNotes(prev => [data, ...prev]);
+        
+        if (data.is_private) {
+          setPrivateNotes(prev => [data, ...prev]);
+        } else {
+          setNotes(prev => [data, ...prev]);
+        }
         clearForm();
       }
     } catch (err) {
@@ -224,12 +252,14 @@ export default function ProfilePage() {
     setSelectedLabels([]);
     setEditingId(null);
     setEditingType(null);
+    setIsPrivate(false);
   };
 
   const handleEdit = (item, type = "note") => {
     setTitle(item.title || "");
     setBody(item.body || "");
     setSelectedLabels(item.labels || []);
+    setIsPrivate(item.is_private || false);
     setEditingId(item.id);
     setEditingType(type);
     setActiveTab("notes");
@@ -237,7 +267,7 @@ export default function ProfilePage() {
   };
 
   const handleDelete = async (id, type = "note") => {
-    const itemType = type === "draft" ? "draft" : "note";
+    const itemType = type === "draft" ? "draft" : type === "private" ? "private note" : "note";
     if (!confirm(`Delete this ${itemType}?`)) return;
 
     try {
@@ -255,6 +285,8 @@ export default function ProfilePage() {
 
       if (type === "draft") {
         setDrafts(prev => prev.filter(d => d.id !== id));
+      } else if (type === "private") {
+        setPrivateNotes(prev => prev.filter(n => n.id !== id));
       } else {
         setNotes(prev => prev.filter(n => n.id !== id));
       }
@@ -336,6 +368,7 @@ export default function ProfilePage() {
         }}
         notesCount={notes.length}
         draftsCount={drafts.length}
+        privateNotesCount={privateNotes.length}
         profile={profile}
         onLogout={handleLogout}
       />
@@ -345,10 +378,26 @@ export default function ProfilePage() {
           <Labels />
         ) : (
           <div className="notes-container">
-            {activeTab === "notes" && (
+            {(activeTab === "notes" || activeTab === "all") && (
               <form className="note-form" onSubmit={handleCreateOrUpdate}>
                 <div className="form-header">
-                  <h2>{editingId ? (editingType === "draft" ? "Edit Draft" : "Edit Note") : "Create New Note"}</h2>
+                  <div className="form-header-left">
+                    <h2>{editingId ? (editingType === "draft" ? "Edit Draft" : "Edit Note") : "Create New Note"}</h2>
+                  </div>
+                  <div className="form-header-right">
+                    <label className="privacy-toggle-header">
+                      <input
+                        type="checkbox"
+                        checked={isPrivate}
+                        onChange={(e) => setIsPrivate(e.target.checked)}
+                        className="privacy-checkbox"
+                      />
+                      <span className="privacy-label-header">
+                        <Lock size={16} />
+                        Make Private
+                      </span>
+                    </label>
+                  </div>
                 </div>
 
                 <div className="form-group">
@@ -410,7 +459,73 @@ export default function ProfilePage() {
             )}
 
             <div className="content-section">
-              {activeTab === "notes" ? (
+              {activeTab === "all" ? (
+                loading ? (
+                  <div className="loading-state">
+                    <div className="loading-spinner"></div>
+                    <p>Loading posts...</p>
+                  </div>
+                ) : notes.length === 0 && privateNotes.length === 0 ? (
+                  <div className="empty-state">
+                    <FileText size={48} className="empty-icon" />
+                    <h3>No posts yet</h3>
+                    <p>Create your first note to get started.</p>
+                  </div>
+                ) : (
+                  <div className="notes-grid">
+                    {[...notes, ...privateNotes]
+                      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                      .map((note) => (
+                      <article key={`${note.is_private ? 'private' : 'public'}-${note.id}`} className={`note-card ${note.is_private ? 'private-card' : ''}`}>
+                        <div className="note-header">
+                          <h3 className="note-title">{note.title}</h3>
+                          <div className="note-actions">
+                            <button
+                              onClick={() => handleEdit(note, note.is_private ? "private" : "note")}
+                              className="action-btn edit-btn"
+                              title="Edit note"
+                            >
+                              <Edit3 size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(note.id, note.is_private ? "private" : "note")}
+                              className="action-btn delete-btn"
+                              title="Delete note"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="note-body">
+                          {note.body}
+                        </div>
+
+                        {note.labels && note.labels.length > 0 && (
+                          <div className="note-labels">
+                            {note.labels.map((label) => (
+                              <span
+                                key={label.id}
+                                className="note-label"
+                                style={{ backgroundColor: label.color }}
+                              >
+                                {label.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="note-meta">
+                          {note.is_private && <span className="private-badge">PRIVATE</span>}
+                          <span className="note-date">
+                            {new Date(note.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                )
+              ) : activeTab === "notes" ? (
                 loading ? (
                   <div className="loading-state">
                     <div className="loading-spinner"></div>
@@ -467,6 +582,65 @@ export default function ProfilePage() {
                         )}
 
                         <div className="note-meta">
+                          <span className="note-date">
+                            {new Date(note.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                )
+              ) : activeTab === "private" ? (
+                privateNotes.length === 0 ? (
+                  <div className="empty-state">
+                    <Lock size={48} className="empty-icon" />
+                    <h3>No private notes yet</h3>
+                    <p>Create a private note to keep it visible only to you!</p>
+                  </div>
+                ) : (
+                  <div className="notes-grid">
+                    {privateNotes.map((note) => (
+                      <article key={note.id} className="note-card private-card">
+                        <div className="note-header">
+                          <h3 className="note-title">{note.title}</h3>
+                          <div className="note-actions">
+                            <button
+                              onClick={() => handleEdit(note, "private")}
+                              className="action-btn edit-btn"
+                              title="Edit private note"
+                            >
+                              <Edit3 size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(note.id, "private")}
+                              className="action-btn delete-btn"
+                              title="Delete private note"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="note-body">
+                          {note.body}
+                        </div>
+
+                        {note.labels && note.labels.length > 0 && (
+                          <div className="note-labels">
+                            {note.labels.map((label) => (
+                              <span
+                                key={label.id}
+                                className="note-label"
+                                style={{ backgroundColor: label.color }}
+                              >
+                                {label.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="note-meta">
+                          <span className="private-badge">PRIVATE</span>
                           <span className="note-date">
                             {new Date(note.created_at).toLocaleDateString()}
                           </span>
@@ -555,6 +729,7 @@ export default function ProfilePage() {
         }}
         notesCount={notes.length}
         draftsCount={drafts.length}
+        privateNotesCount={privateNotes.length}
       />
 
       <style jsx>{`
@@ -623,11 +798,56 @@ export default function ProfilePage() {
           padding: 2rem;
         }
 
-        .form-header h2 {
-          color: var(--text-primary);
+        .form-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
           margin-bottom: 1.5rem;
+          flex-wrap: wrap;
+          gap: 1rem;
+        }
+
+        .form-header-left h2 {
+          color: var(--text-primary);
           font-size: 1.25rem;
           font-weight: 600;
+          margin: 0;
+        }
+
+        .form-header-right {
+          display: flex;
+          align-items: center;
+        }
+
+        .privacy-toggle-header {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          cursor: pointer;
+          padding: 0.5rem 1rem;
+          border: 1px solid var(--border-primary);
+          border-radius: 6px;
+          background: var(--bg-tertiary);
+          transition: all 0.2s ease;
+          font-size: 0.875rem;
+        }
+
+        .privacy-toggle-header:hover {
+          background: var(--bg-accent);
+          border-color: var(--border-secondary);
+        }
+
+        .privacy-toggle-header input[type="checkbox"]:checked + .privacy-label-header {
+          color: var(--accent-primary);
+        }
+
+        .privacy-label-header {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          color: var(--text-secondary);
+          font-weight: 500;
+          user-select: none;
         }
 
         .form-actions {
@@ -794,6 +1014,26 @@ export default function ProfilePage() {
           text-transform: uppercase;
         }
 
+        .private-badge {
+          background: var(--accent-primary);
+          color: white;
+          padding: 0.125rem 0.5rem;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 0.625rem;
+          text-transform: uppercase;
+        }
+
+        .private-card {
+          border-left: 4px solid var(--accent-primary);
+        }
+
+        .privacy-checkbox {
+          width: 1rem;
+          height: 1rem;
+          accent-color: var(--accent-primary);
+        }
+
         .note-date {
           font-size: 0.75rem;
         }
@@ -859,8 +1099,23 @@ export default function ProfilePage() {
             padding: 1rem;
           }
 
-          .form-header h2 {
+          .form-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+          }
+
+          .form-header-left h2 {
             font-size: 1.125rem;
+          }
+
+          .form-header-right {
+            width: 100%;
+          }
+
+          .privacy-toggle-header {
+            width: 100%;
+            justify-content: center;
           }
 
           .notes-grid {

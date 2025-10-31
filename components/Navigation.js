@@ -1,34 +1,48 @@
 "use client";
 
-import { useState } from 'react';
-import { useTheme } from '../contexts/ThemeContext';
-import { 
-  FileText, 
-  FileEdit, 
-  Tag, 
-  Sun, 
-  Moon, 
-  Menu, 
-  X, 
+import { useState } from "react";
+import { useTheme } from "../contexts/ThemeContext";
+import {
+  FileText,
+  FileEdit,
+  Tag,
+  Sun,
+  Moon,
+  Menu,
+  X,
   LogOut,
-  BookOpen
-} from 'lucide-react';
+  BookOpen,
+  Lock,
+} from "lucide-react";
 
-export default function Navigation({ 
-  activeTab, 
-  setActiveTab, 
-  notesCount = 0, 
-  draftsCount = 0, 
-  profile, 
-  onLogout 
+export default function Navigation({
+  activeTab,
+  setActiveTab,
+  notesCount = 0,
+  draftsCount = 0,
+  privateNotesCount = 0,
+  profile,
+  onLogout,
 }) {
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { id: 'notes', label: 'Notes', count: notesCount, icon: FileText },
-    { id: 'drafts', label: 'Drafts', count: draftsCount, icon: FileEdit },
-    { id: 'labels', label: 'Labels', count: 0, icon: Tag },
+    {
+      id: "all",
+      label: "All Posts",
+      count: notesCount + privateNotesCount,
+      icon: FileText,
+    },
+    { id: "notes", label: "Public Notes", count: notesCount, icon: FileText },
+    {
+      id: "private",
+      label: "Private Notes",
+      count: privateNotesCount,
+      icon: Lock,
+    },
+    { id: "drafts", label: "Drafts", count: draftsCount, icon: FileEdit },
+    { id: "labels", label: "Labels", count: 0, icon: Tag },
   ];
 
   return (
@@ -37,7 +51,7 @@ export default function Navigation({
       <div className="nav-desktop">
         <div className="nav-brand">
           <BookOpen size={24} />
-          <h1>MiniSamantha</h1>
+          <h1>SNotes</h1>
         </div>
 
         <div className="nav-tabs">
@@ -47,7 +61,9 @@ export default function Navigation({
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`nav-tab ${activeTab === item.id ? 'nav-tab-active' : ''}`}
+                className={`nav-tab ${
+                  activeTab === item.id ? "nav-tab-active" : ""
+                }`}
               >
                 <IconComponent size={18} className="nav-tab-icon" />
                 <span className="nav-tab-label">{item.label}</span>
@@ -63,9 +79,9 @@ export default function Navigation({
           <button
             onClick={toggleTheme}
             className="theme-toggle"
-            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+            title={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
           >
-            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+            {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
           </button>
 
           {profile ? (
@@ -79,12 +95,17 @@ export default function Navigation({
                 Logout
               </button>
             </div>
-          ) : onLogout && (
-            // Fallback logout button if profile is not loaded but logout function exists
-            <button onClick={onLogout} className="logout-btn logout-btn-simple">
-              <LogOut size={16} />
-              Logout
-            </button>
+          ) : (
+            onLogout && (
+              // Fallback logout button if profile is not loaded but logout function exists
+              <button
+                onClick={onLogout}
+                className="logout-btn logout-btn-simple"
+              >
+                <LogOut size={16} />
+                Logout
+              </button>
+            )
           )}
         </div>
       </div>
@@ -94,15 +115,15 @@ export default function Navigation({
         <div className="nav-mobile-header">
           <div className="nav-mobile-brand">
             <BookOpen size={20} />
-            <h1>MiniSamantha</h1>
+            <h1>SNotes</h1>
           </div>
           <div className="nav-mobile-actions">
             <button
               onClick={toggleTheme}
               className="theme-toggle"
-              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+              title={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
             >
-              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+              {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
             </button>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -125,7 +146,9 @@ export default function Navigation({
                       setActiveTab(item.id);
                       setIsMobileMenuOpen(false);
                     }}
-                    className={`nav-mobile-tab ${activeTab === item.id ? 'nav-mobile-tab-active' : ''}`}
+                    className={`nav-mobile-tab ${
+                      activeTab === item.id ? "nav-mobile-tab-active" : ""
+                    }`}
                   >
                     <IconComponent size={18} className="nav-tab-icon" />
                     <span className="nav-tab-label">{item.label}</span>
@@ -148,14 +171,19 @@ export default function Navigation({
                   Logout
                 </button>
               </div>
-            ) : onLogout && (
-              // Fallback logout for mobile
-              <div className="nav-mobile-profile">
-                <button onClick={onLogout} className="logout-btn logout-btn-simple">
-                  <LogOut size={16} />
-                  Logout
-                </button>
-              </div>
+            ) : (
+              onLogout && (
+                // Fallback logout for mobile
+                <div className="nav-mobile-profile">
+                  <button
+                    onClick={onLogout}
+                    className="logout-btn logout-btn-simple"
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
+              )
             )}
           </div>
         )}
@@ -175,7 +203,6 @@ export default function Navigation({
           align-items: center;
           justify-content: space-between;
           padding: 1rem 2rem;
-          max-width: 1200px;
           margin: 0 auto;
         }
 

@@ -260,11 +260,11 @@ export default function LabelSelector({ selectedLabels = [], onLabelsChange }) {
           top: 100%;
           left: 0;
           right: 0;
-          z-index: 1000;
+          z-index: 50;
           background: var(--bg-primary);
           border: 1px solid var(--border-primary);
           border-radius: 8px;
-          box-shadow: 0 4px 12px var(--shadow-lg);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           margin-top: 0.25rem;
           max-height: 200px;
           overflow: hidden;

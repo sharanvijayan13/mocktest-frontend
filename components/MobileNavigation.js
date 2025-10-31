@@ -1,19 +1,22 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { FileText, FileEdit, Tag } from 'lucide-react';
+import { FileText, FileEdit, Tag, Lock } from 'lucide-react';
 
 export default function MobileNavigation({ 
   activeTab, 
   setActiveTab, 
   notesCount = 0, 
-  draftsCount = 0 
+  draftsCount = 0,
+  privateNotesCount = 0
 }) {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
   const navItems = [
-    { id: 'notes', label: 'Notes', count: notesCount, icon: FileText },
+    { id: 'all', label: 'All', count: notesCount + privateNotesCount, icon: FileText },
+    { id: 'notes', label: 'Public', count: notesCount, icon: FileText },
+    { id: 'private', label: 'Private', count: privateNotesCount, icon: Lock },
     { id: 'drafts', label: 'Drafts', count: draftsCount, icon: FileEdit },
     { id: 'labels', label: 'Labels', count: 0, icon: Tag },
   ];

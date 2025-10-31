@@ -47,7 +47,7 @@ export default function Login() {
       <div className="auth-header">
         <div className="brand">
           <BookOpen size={24} />
-          <h1>MiniSamantha</h1>
+          <h1>SNotes</h1>
         </div>
         <button
           onClick={toggleTheme}

@@ -52,7 +52,7 @@ export default function Signup() {
       <div className="auth-header">
         <div className="brand">
           <BookOpen size={24} />
-          <h1>MiniSamantha</h1>
+          <h1>SNotes</h1>
         </div>
         <button
           onClick={toggleTheme}
@@ -66,7 +66,7 @@ export default function Signup() {
       <div className="auth-card">
         <div className="auth-card-header">
           <h2>Create Account</h2>
-          <p>Join MiniSamantha to start organizing your notes</p>
+          <p>Join SNotes to start organizing your notes</p>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">

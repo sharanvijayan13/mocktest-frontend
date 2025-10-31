@@ -11,7 +11,7 @@ export default function Labels() {
   const [selectedColor, setSelectedColor] = useState('#3b82f6');
 
   const colors = [
-    '#3b82f6', '#10b981', '#f59e0b', '#ef4444', 
+    '#3b82f6', '#10b981', '#f59e0b', '#ef4444',
     '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'
   ];
 
@@ -57,7 +57,7 @@ export default function Labels() {
             className="label-input"
             maxLength={20}
           />
-          
+
           <div className="color-picker">
             {colors.map(color => (
               <button
@@ -70,7 +70,7 @@ export default function Labels() {
               />
             ))}
           </div>
-          
+
           <button type="submit" className="add-label-btn">
             <Plus size={16} />
             Add Label
@@ -90,7 +90,7 @@ export default function Labels() {
             {labels.map(label => (
               <div key={label.id} className="label-card">
                 <div className="label-info">
-                  <div 
+                  <div
                     className="label-color"
                     style={{ backgroundColor: label.color }}
                   />
@@ -99,15 +99,15 @@ export default function Labels() {
                     <span className="label-count">{label.count} notes</span>
                   </div>
                 </div>
-                
+
                 <div className="label-actions">
-                  <button 
+                  <button
                     className="edit-btn"
                     title="Edit label"
                   >
                     <Edit2 size={14} />
                   </button>
-                  <button 
+                  <button
                     className="delete-btn"
                     onClick={() => handleDeleteLabel(label.id)}
                     title="Delete label"
@@ -137,9 +137,8 @@ export default function Labels() {
 
       <style jsx>{`
         .labels-container {
-          max-width: 800px;
+          max-width: 1200px;
           margin: 0 auto;
-          padding: 2rem;
         }
 
         .labels-header {
